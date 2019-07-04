@@ -5,6 +5,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+
 
 const ROOT_URL = "https://api.gnavi.co.jp/RestSearchAPI/v3/"
 const API_KEY = process.env.REACT_APP_API_KEY
@@ -38,7 +41,7 @@ class SearchShopForm extends Component {
   async onClick(){
     await axios.get(`${ROOT_URL}?keyid=${API_KEY}&latitude=${this.state.current_place[0]}&longitude=${this.state.current_place[1]}&range=${this.state.radius}&offset_page=1`)
     .then((result) =>{
-      console.log(result.data.rest)
+      this.setState({results_array: result.data.rest})
     })
   }
 
@@ -63,6 +66,22 @@ class SearchShopForm extends Component {
           <Button style={{ display: this.state.current_place.length !== 0 ? "" : "none",marginTop: "20px" }}onClick={this.onClick} type="submit" variant="contained" color="primary" >
             検索
           </Button>
+
+          {this.state.results_array.map((shop,i) =>(
+            <Card key={i}>
+              <CardContent>
+                <p>{shop.name}</p>
+                <p>
+                  {shop.access.station}{shop.access.line}{shop.access.station_exit}
+                  {shop.access.walk ?
+                    "徒歩"+shop.access.walk.replace(/[^0-9]/g, "")+"分"
+                  :
+                    ""
+                  }
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </React.Fragment>
     )
